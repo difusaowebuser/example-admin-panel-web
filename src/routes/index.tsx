@@ -18,5 +18,5 @@ export const Routes: React.FC = () => {
     )
   }
 
-  return false ? <AppRoutes /> : <AccessRoutes />
+  return true ? <AppRoutes /> : <AccessRoutes />
 }

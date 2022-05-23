@@ -2,18 +2,19 @@ import * as React from 'react'
 import ReactDOM from 'react-dom'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
-import { Routes } from './routes'
-import { theme } from './styles/theme'
+import { Provider as ReduxProvider } from 'react-redux'
 
-import { AccessProvider } from './contexts/access'
+import { Routes } from './src/routes'
+import { theme } from './src/styles/theme'
+import { store } from './src/redux'
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AccessProvider>
+      <ReduxProvider store={store}>
         <Routes />
-      </AccessProvider>
+      </ReduxProvider>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

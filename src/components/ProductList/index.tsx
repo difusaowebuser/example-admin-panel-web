@@ -30,6 +30,9 @@ import {
   Menu,
   MenuItem
 } from '@mui/material'
+import { useSelector, useDispatch } from 'react-redux'
+
+import { getProducts, RootState } from '../../redux'
 
 interface Data {
   id: number
@@ -323,6 +326,12 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 }
 
 export function ProductList() {
+  const { products } = useSelector(
+    (state: ReturnType<RootState>) => state.products
+  )
+  const dispatch = useDispatch()
+
+  const [loadingGetProduct, setLoadingGetProduct] = React.useState(true)
   const [order, setOrder] = React.useState<Order>('desc')
   const [orderBy, setOrderBy] = React.useState<keyof Data>('date')
   const [selected, setSelected] = React.useState<readonly string[]>([])
@@ -409,6 +418,14 @@ export function ProductList() {
     handleRowCellClose()
     console.log('handleRowCellEdit')
   }
+
+  React.useEffect(() => {
+    async function onGetProducts() {
+      await dispatch(getProducts())
+      setLoadingGetProduct(false)
+    }
+    onGetProducts()
+  })
 
   return (
     // <Box sx={{ width: '100%' }}>

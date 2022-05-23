@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { SignIn } from '../../screens/SignIn'
+import { SignIn } from '../../pages/SignIn'
 
 export const AccessRoutes: React.FC = () => {
   return <SignIn />

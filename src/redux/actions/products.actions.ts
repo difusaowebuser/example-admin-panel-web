@@ -1,28 +1,23 @@
 import axios, { AxiosError } from 'axios'
 import { ActionCreator, Dispatch } from 'redux'
 
-import {
-  GetProductsSuccessReturnActionInterface,
-  ProductsActionTypes,
-  GET_PRODUCTS
-} from '../types'
+import { ProductData, ProductsActionTypes, GET_PRODUCTS } from '../types'
 import { productsService } from '../../services'
 import { RootState } from '../store'
 
 const getProductsSuccess: ActionCreator<ProductsActionTypes> = (
-  success: GetProductsSuccessReturnActionInterface
+  success: ProductData[]
 ) => {
-  return { type: GET_PRODUCTS, payload: { success, failure: null } }
+  return { type: GET_PRODUCTS, payload: success }
 }
 
 export function getProducts() {
   return async dispatch => {
     try {
       console.log('getProducts')
-      const data = await productsService.getProducts()
-      console.log(data)
+      const { data } = await productsService.getProducts()
 
-      dispatch(getProductsSuccess(data))
+      dispatch(getProductsSuccess(data?.success))
     } catch (err) {
       console.log(err)
     }

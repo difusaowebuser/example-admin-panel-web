@@ -1,7 +1,7 @@
 import { GET_PRODUCTS, ProductsActionTypes, ProductsState } from '../types'
 
 const initialState: ProductsState = {
-  products: null
+  productsList: null
 }
 
 export function productsReducer(
@@ -12,7 +12,7 @@ export function productsReducer(
     case GET_PRODUCTS: {
       return {
         ...state,
-        products: action.payload.success?.products ?? null
+        productsList: action.payload ?? null
       }
     }
     default:

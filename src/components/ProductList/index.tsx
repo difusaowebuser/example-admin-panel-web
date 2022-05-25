@@ -4,10 +4,11 @@ import {
   Replay as ReplayIcon,
   MoreVert as MoreVertIcon,
   Delete as DeleteIcon,
-  Edit as EditIcon
+  Edit as EditIcon,
+  TableRows
 } from '@mui/icons-material'
 import { visuallyHidden } from '@mui/utils'
-
+import { DateTime } from 'luxon'
 import {
   Box,
   Table,
@@ -28,77 +29,12 @@ import {
   Tooltip,
   Avatar,
   Menu,
-  MenuItem
+  MenuItem,
+  CircularProgress
 } from '@mui/material'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { getProducts, RootState } from '../../redux'
-
-interface Data {
-  id: number
-  image: string
-  name: string
-  sku: number
-  stock: boolean
-  price: number
-  category: string
-  date: string
-}
-
-function createData(
-  id: number,
-  image: string,
-  name: string,
-  sku: number,
-  stock: boolean,
-  price: number,
-  category: string,
-  date: string
-): Data {
-  return {
-    id,
-    image,
-    name,
-    sku,
-    stock,
-    price,
-    category,
-    date
-  }
-}
-
-const rows = [
-  createData(
-    1,
-    'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=164&h=164&fit=crop&auto=format',
-    'Bolsa preta',
-    1,
-    true,
-    123.75,
-    'Bolsa',
-    '2022-05-02 12:15:45'
-  ),
-  createData(
-    2,
-    'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=164&h=164&fit=crop&auto=format',
-    'Bolsa branca',
-    2,
-    true,
-    145,
-    'Bolsa',
-    '2022-05-01 13:01:45'
-  ),
-  createData(
-    3,
-    'https://images.unsplash.com/photo-1522770179533-24471fcdba45?w=164&h=164&fit=crop&auto=format',
-    'Cinto',
-    3,
-    false,
-    23,
-    'Cinto',
-    '2022-05-20 17:01:45'
-  )
-]
+import { ProductData, getProducts, RootState } from '../../redux'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -115,17 +51,12 @@ type Order = 'asc' | 'desc'
 function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
-) => number {
+): (a: { [key in Key]: Key }, b: { [key in Key]: number | string }) => number {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy)
 }
 
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
 function stableSort<T>(
   array: readonly T[],
   comparator: (a: T, b: T) => number
@@ -143,7 +74,7 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean
-  id: keyof Data
+  id: keyof ProductData
   label: string
   numeric: boolean
   noShort?: true
@@ -188,10 +119,10 @@ const headCells: readonly HeadCell[] = [
     label: 'Categoria'
   },
   {
-    id: 'date',
+    id: 'created_at',
     numeric: false,
     disablePadding: false,
-    label: 'Data'
+    label: 'ProductData'
   }
 ]
 
@@ -199,7 +130,7 @@ interface EnhancedTableProps {
   numSelected: number
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof ProductData
   ) => void
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void
   order: Order
@@ -217,7 +148,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     onRequestSort
   } = props
   const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof ProductData) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property)
     }
 
@@ -269,11 +200,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
+  loading: boolean
   numSelected: number
+  onGetProducts(): void
 }
 
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const { numSelected } = props
+  const { loading, numSelected, onGetProducts } = props
 
   return (
     <Toolbar
@@ -316,9 +249,13 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
-            <ReplayIcon />
-          </IconButton>
+          {loading ? (
+            <CircularProgress size={24} sx={{ margin: 1 }} />
+          ) : (
+            <IconButton onClick={onGetProducts}>
+              <ReplayIcon />
+            </IconButton>
+          )}
         </Tooltip>
       )}
     </Toolbar>
@@ -326,14 +263,15 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 }
 
 export function ProductList() {
-  const { products } = useSelector(
+  const { productsList } = useSelector(
     (state: ReturnType<RootState>) => state.products
   )
   const dispatch = useDispatch()
 
-  const [loadingGetProduct, setLoadingGetProduct] = React.useState(true)
+  const [loadingGetProduct, setLoadingGetProduct] = React.useState(false)
+  const [rows, setRows] = React.useState<ProductData[] | null>(null)
   const [order, setOrder] = React.useState<Order>('desc')
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('date')
+  const [orderBy, setOrderBy] = React.useState<keyof ProductData>('created_at')
   const [selected, setSelected] = React.useState<readonly string[]>([])
   const [page, setPage] = React.useState(0)
   const [dense, setDense] = React.useState(false)
@@ -345,7 +283,7 @@ export function ProductList() {
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof ProductData
   ) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
@@ -354,7 +292,7 @@ export function ProductList() {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map(n => n.name)
+      const newSelecteds = rows?.map(n => n.name)
       setSelected(newSelecteds)
       return
     }
@@ -398,9 +336,8 @@ export function ProductList() {
 
   const isSelected = (name: string) => selected.indexOf(name) !== -1
 
-  // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - (rows?.length ?? 0)) : 0
 
   const handleRowCellClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setRowCellAnchorEl(event.currentTarget)
@@ -409,9 +346,12 @@ export function ProductList() {
     setRowCellAnchorEl(null)
   }
 
-  const handleRowCellDelete = () => {
+  const handleRowCellDelete = (id: number) => {
     handleRowCellClose()
     console.log('handleRowCellDelete')
+    if (rows) {
+      setRows(rows.filter(r => !(r?.id === id)))
+    }
   }
 
   const handleRowCellEdit = () => {
@@ -419,18 +359,31 @@ export function ProductList() {
     console.log('handleRowCellEdit')
   }
 
-  React.useEffect(() => {
-    async function onGetProducts() {
-      await dispatch(getProducts())
-      setLoadingGetProduct(false)
+  async function onGetProducts() {
+    console.log('onGetProducts')
+    setLoadingGetProduct(true)
+    // await new Promise(r => setTimeout(r, 60 * 1000))
+    await dispatch(getProducts())
+    if (productsList) {
+      console.log(productsList)
+      setRows(productsList)
+      console.log(rows)
     }
+    setLoadingGetProduct(false)
+  }
+
+  React.useEffect(() => {
     onGetProducts()
-  })
+  }, [])
 
   return (
     // <Box sx={{ width: '100%' }}>
     <Paper sx={{ width: '100%', mb: 2 }}>
-      <EnhancedTableToolbar numSelected={selected.length} />
+      <EnhancedTableToolbar
+        numSelected={selected.length}
+        loading={loadingGetProduct}
+        onGetProducts={onGetProducts}
+      />
       <TableContainer>
         <Table
           sx={{ minWidth: 750 }}
@@ -443,113 +396,117 @@ export function ProductList() {
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={rows.length}
+            rowCount={rows?.length ?? 0}
           />
-          <TableBody>
-            {/* if you don't need to support IE11, you can replace the `stableSort` call with:
-              rows.slice().sort(getComparator(order, orderBy)) */}
-            {stableSort(rows, getComparator(order, orderBy))
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => {
-                const isItemSelected = isSelected(row.name)
-                const labelId = `enhanced-table-checkbox-${index}`
+          {rows && (
+            <TableBody>
+              {stableSort(rows, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => {
+                  const isItemSelected = isSelected(row.name)
+                  const labelId = `enhanced-table-checkbox-${index}`
 
-                return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.name}
-                    selected={isItemSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId
-                        }}
-                        onClick={event => handleClick(event, row.name)}
-                      />
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
+                  const rowDateTimeString = DateTime.fromISO(
+                    row.created_at
+                  ).toFormat('dd/MM/yyyy HH:mm')
+
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
                     >
-                      <Avatar
-                        alt={row.name}
-                        src={row.image}
-                        variant="square"
-                        sx={{ margin: 2, width: 100, height: 100 }}
-                      />
-                    </TableCell>
-                    <TableCell align="left">{row.name}</TableCell>
-                    <TableCell align="left">{row.sku}</TableCell>
-                    <TableCell align="left">
-                      {row.stock ? 'Em estoque' : 'Em falta'}
-                    </TableCell>
-                    <TableCell align="left">{row.price}</TableCell>
-                    <TableCell align="left">{row.category}</TableCell>
-                    <TableCell align="left">{row.date}</TableCell>
-                    <TableCell>
-                      <div>
-                        <IconButton
-                          id="rowCellBasicButton"
-                          aria-controls={
-                            rowCellOpen ? 'rowCellBasicMenu' : undefined
-                          }
-                          aria-haspopup="true"
-                          aria-expanded={rowCellOpen ? 'true' : undefined}
-                          onClick={handleRowCellClick}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          id="rowCellBasicMenu"
-                          anchorEl={rowCellAnchorEl}
-                          open={rowCellOpen}
-                          onClose={handleRowCellClose}
-                          MenuListProps={{
-                            'aria-labelledby': 'rowCellBasicButton'
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId
                           }}
-                        >
-                          <MenuItem
-                            onClick={handleRowCellDelete}
-                            sx={{ color: '#f00' }}
+                          onClick={event => handleClick(event, row.name)}
+                        />
+                      </TableCell>
+                      <TableCell
+                        align="left"
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                      >
+                        <Avatar
+                          alt={row.name}
+                          src={row.image}
+                          variant="square"
+                          sx={{ margin: 2, width: 100, height: 100 }}
+                        />
+                      </TableCell>
+                      <TableCell align="left">{row.name}</TableCell>
+                      <TableCell align="left">{row.sku}</TableCell>
+                      <TableCell align="left">
+                        {row.stock ? 'Em estoque' : 'Em falta'}
+                      </TableCell>
+                      <TableCell align="left">{row.price}</TableCell>
+                      <TableCell align="left">{row.category}</TableCell>
+                      <TableCell align="left">{rowDateTimeString}</TableCell>
+                      <TableCell>
+                        <div>
+                          <IconButton
+                            id="rowCellBasicButton"
+                            aria-controls={
+                              rowCellOpen ? 'rowCellBasicMenu' : undefined
+                            }
+                            aria-haspopup="true"
+                            aria-expanded={rowCellOpen ? 'true' : undefined}
+                            onClick={handleRowCellClick}
                           >
-                            <DeleteIcon sx={{ marginRight: 2 }} />
-                            Deletar
-                          </MenuItem>
-                          <MenuItem onClick={handleRowCellEdit}>
-                            <EditIcon sx={{ marginRight: 2 }} />
-                            Editar
-                          </MenuItem>
-                        </Menu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            {emptyRows > 0 && (
-              <TableRow
-                style={{
-                  height: (dense ? 33 : 53) * emptyRows
-                }}
-              >
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
-          </TableBody>
+                            <MoreVertIcon />
+                          </IconButton>
+                          <Menu
+                            id="rowCellBasicMenu"
+                            anchorEl={rowCellAnchorEl}
+                            open={rowCellOpen}
+                            onClose={handleRowCellClose}
+                            MenuListProps={{
+                              'aria-labelledby': 'rowCellBasicButton'
+                            }}
+                          >
+                            <MenuItem
+                              onClick={handleRowCellDelete(row.id)}
+                              sx={{ color: '#f00' }}
+                            >
+                              <DeleteIcon sx={{ marginRight: 2 }} />
+                              Deletar
+                            </MenuItem>
+                            <MenuItem onClick={handleRowCellEdit}>
+                              <EditIcon sx={{ marginRight: 2 }} />
+                              Editar
+                            </MenuItem>
+                          </Menu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              {emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: (dense ? 33 : 53) * emptyRows
+                  }}
+                >
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+          )}
         </Table>
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 50, 100, { value: -1, label: 'Todos' }]}
         component="div"
-        count={rows.length}
+        count={rows?.length ?? 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

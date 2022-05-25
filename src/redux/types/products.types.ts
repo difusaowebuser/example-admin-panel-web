@@ -4,27 +4,20 @@ export interface ProductData {
   name: string
   sku: number
   stock: boolean
-  category: number
   created_at: string
-  updated_at: string
-  price: number
-}
-
-export interface GetProductsSuccessReturnActionInterface {
-  products: ProductData[]
+  price: string
+  category: string
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS'
 
 interface GetProductsAction {
   type: typeof GET_PRODUCTS
-  payload: {
-    success: GetProductsSuccessReturnActionInterface | null
-  }
+  payload: ProductData[] | null
 }
 
 export interface ProductsState {
-  products: ProductData[] | null
+  productsList: ProductData[] | null
 }
 
 export type ProductsActionTypes = GetProductsAction

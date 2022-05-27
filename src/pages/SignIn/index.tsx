@@ -8,12 +8,9 @@ import {
   Paper
 } from '@mui/material'
 
-import { useAccess } from '../../contexts/access'
 import { Copyright } from '../../components/Copyright'
 
 export function SignIn() {
-  const { accessLogIn } = useAccess()
-
   const [userLogin, setUserLogin] = React.useState<string | null>(
     'johnsistema@gmail.com'
   )
@@ -22,9 +19,9 @@ export function SignIn() {
   )
 
   function handleSignIn() {
-    if (userLogin && userPass) {
-      accessLogIn({ userLogin, userPass })
-    }
+    // if (userLogin && userPass) {
+    //   accessLogIn({ userLogin, userPass })
+    // }
   }
 
   return (

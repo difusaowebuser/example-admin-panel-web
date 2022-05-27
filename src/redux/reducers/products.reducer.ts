@@ -1,7 +1,13 @@
-import { GET_PRODUCTS, ProductsActionTypes, ProductsState } from '../types'
+import {
+  GET_PRODUCTS,
+  DELETE_PRODUCTS,
+  ProductsActionTypes,
+  ProductsState
+} from '../types'
 
 const initialState: ProductsState = {
-  productsList: null
+  productsList: null,
+  deletedProducts: null
 }
 
 export function productsReducer(
@@ -13,6 +19,12 @@ export function productsReducer(
       return {
         ...state,
         productsList: action.payload ?? null
+      }
+    }
+    case DELETE_PRODUCTS: {
+      return {
+        ...state,
+        deletedProducts: action.payload
       }
     }
     default:

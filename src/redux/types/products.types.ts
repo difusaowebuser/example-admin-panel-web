@@ -10,14 +10,21 @@ export interface ProductData {
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS'
+export const DELETE_PRODUCTS = 'DELETE_PRODUCTS'
 
 interface GetProductsAction {
   type: typeof GET_PRODUCTS
   payload: ProductData[] | null
 }
 
-export interface ProductsState {
-  productsList: ProductData[] | null
+interface DeleteProductsAction {
+  type: typeof DELETE_PRODUCTS
+  payload: true | null
 }
 
-export type ProductsActionTypes = GetProductsAction
+export interface ProductsState {
+  productsList: ProductData[] | null
+  deletedProducts: true | null
+}
+
+export type ProductsActionTypes = GetProductsAction | DeleteProductsAction

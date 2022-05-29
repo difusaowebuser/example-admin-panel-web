@@ -7,13 +7,13 @@ import {
   Grid,
   Button
 } from '@mui/material'
-import { Copyright } from '../../components/Copyright'
 
-import { Add as AddIcon } from '@mui/icons-material'
-
-import { ProductList } from '../../components/ProductList'
+import { Copyright } from '../../components/atoms/Copyright'
 import { AppBar } from '../../components/AppBar'
 import { SideBar } from '../../components/molecules/SideBar'
+import { ProductsAddFormEdit } from '../../components/molecules/ProductsAddFormEdit'
+import { ProductsAddFormEdit2 } from '../../components/molecules/ProductsAddFormEdit2'
+import { ProductsAddFormEdit3 } from '../../components/molecules/ProductsAddFormEdit3'
 
 export const ProductsAdd: React.FC = () => {
   const [open, setOpen] = React.useState(true)
@@ -23,7 +23,7 @@ export const ProductsAdd: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar open={open} toggleDrawer={toggleDrawer} title="Produtos" />
+      <AppBar open={open} toggleDrawer={toggleDrawer} title="Adicionar" />
       <SideBar open={open} toggleDrawer={toggleDrawer} />
       <Box
         component="main"
@@ -46,32 +46,21 @@ export const ProductsAdd: React.FC = () => {
                 variant="h5"
                 sx={{ fontWeight: 'bold' }}
               >
-                Lista de produtos
+                Criar um novo produto
               </Typography>
-            </Box>
-            <Box sx={{ flexShrink: 0 }}>
-              <Button variant="contained" startIcon={<AddIcon />}>
-                Novo Produto
-              </Button>
             </Box>
           </Box>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
-              {/* <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}> */}
-              <ProductList />
-              {/* </Paper> */}
+            <Grid item xs={8}>
+              <ProductsAddFormEdit />
+            </Grid>
+            <Grid item xs={4}>
+              <ProductsAddFormEdit2 />
+              <ProductsAddFormEdit3 />
+              <Button variant="contained">Criar produto</Button>
             </Grid>
           </Grid>
-          <Copyright
-            sx={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bottom: 0,
-              my: 2
-            }}
-          />
+          <Copyright />
         </Container>
       </Box>
     </Box>

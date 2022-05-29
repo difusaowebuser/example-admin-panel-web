@@ -8,7 +8,7 @@ import {
   Paper
 } from '@mui/material'
 
-import { Copyright } from '../../components/Copyright'
+import { Copyright } from '../../components/atoms/Copyright'
 
 export function SignIn() {
   const [userLogin, setUserLogin] = React.useState<string | null>(
@@ -91,16 +91,7 @@ export function SignIn() {
           </Box>
         </Paper>
       </Container>
-      <Copyright
-        sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bottom: 0,
-          my: 2
-        }}
-      />
+      <Copyright />
     </>
   )
 }

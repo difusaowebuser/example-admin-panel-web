@@ -17,7 +17,7 @@ import {
   IconButton,
   Avatar
 } from '@mui/material'
-import { Copyright } from '../../components/Copyright'
+import { Copyright } from '../atoms/Copyright'
 
 import {
   Menu as MenuIcon,

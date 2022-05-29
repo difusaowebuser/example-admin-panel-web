@@ -1,55 +1,19 @@
 import * as React from 'react'
-import { styled, createTheme } from '@mui/material/styles'
 import {
-  Drawer as MuiDrawer,
   Box,
   Toolbar,
-  List,
   Typography,
-  Divider,
-  IconButton,
   Container,
   Grid,
   Button
 } from '@mui/material'
-import { Copyright } from '../../components/Copyright'
+import { Copyright } from '../../components/atoms/Copyright'
 
-import {
-  ChevronLeft as ChevronLeftIcon,
-  Add as AddIcon
-} from '@mui/icons-material'
+import { Add as AddIcon } from '@mui/icons-material'
 
-import { MainListItems } from '../../components/ListItems'
-import { ProductList } from '../../components/ProductList'
+import { ProductList } from '../../components/molecules/ProductList'
 import { AppBar } from '../../components/AppBar'
-
-const drawerWidth = 240
-
-const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: prop => prop !== 'open'
-})(({ theme, open }) => ({
-  '& .MuiDrawer-paper': {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    }),
-    boxSizing: 'border-box',
-    ...(!open && {
-      overflowX: 'hidden',
-      transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen
-      }),
-      width: theme.spacing(7),
-      [theme.breakpoints.up('sm')]: {
-        width: theme.spacing(9)
-      }
-    })
-  }
-}))
+import { SideBar } from '../../components/molecules/SideBar'
 
 export const ProductsList: React.FC = () => {
   const [open, setOpen] = React.useState(true)
@@ -60,24 +24,7 @@ export const ProductsList: React.FC = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar open={open} toggleDrawer={toggleDrawer} title="Produtos" />
-      <Drawer variant="permanent" open={open}>
-        <Toolbar
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            px: [1]
-          }}
-        >
-          <IconButton onClick={toggleDrawer}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </Toolbar>
-        <Divider />
-        <List component="nav">
-          <MainListItems />
-        </List>
-      </Drawer>
+      <SideBar open={open} toggleDrawer={toggleDrawer} />
       <Box
         component="main"
         sx={{
@@ -110,21 +57,10 @@ export const ProductsList: React.FC = () => {
           </Box>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              {/* <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}> */}
               <ProductList />
-              {/* </Paper> */}
             </Grid>
           </Grid>
-          <Copyright
-            sx={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bottom: 0,
-              my: 2
-            }}
-          />
+          <Copyright />
         </Container>
       </Box>
     </Box>

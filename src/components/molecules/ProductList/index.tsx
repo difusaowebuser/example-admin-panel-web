@@ -42,7 +42,7 @@ import {
   ProductData,
   getProducts,
   RootState
-} from '../../redux'
+} from '../../../redux'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {

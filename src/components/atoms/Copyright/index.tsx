@@ -9,6 +9,14 @@ export const Copyright = (props: any) => {
       align="center"
       {...props}
       component="small"
+      sx={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bottom: 0,
+        my: 2
+      }}
     >
       &copy; {new Date().getFullYear()} Jonh Sistema &bull; Desenvolvido
       por&nbsp;

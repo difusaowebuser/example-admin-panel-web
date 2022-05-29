@@ -5,6 +5,7 @@ import {
   ProductData,
   ProductsActionTypes,
   GET_PRODUCTS,
+  CREATE_PRODUCT,
   DELETE_PRODUCTS
 } from '../types'
 import { productsService } from '../../services'
@@ -17,6 +18,15 @@ const getProductsSuccess: ActionCreator<ProductsActionTypes> = (
 }
 const getProductsFailure: ActionCreator<ProductsActionTypes> = () => {
   return { type: GET_PRODUCTS, payload: null }
+}
+
+const createProductSuccess: ActionCreator<ProductsActionTypes> = (
+  success: ProductData[]
+) => {
+  return { type: CREATE_PRODUCT, payload: success }
+}
+const createProductFailure: ActionCreator<ProductsActionTypes> = () => {
+  return { type: CREATE_PRODUCT, payload: null }
 }
 
 const deleteProductsSuccess: ActionCreator<ProductsActionTypes> = () => {
@@ -34,6 +44,18 @@ export function getProducts() {
     } catch (err) {
       console.log(err)
       getProductsFailure()
+    }
+  }
+}
+
+export function createProduct() {
+  return async dispatch => {
+    try {
+      const { data } = await productsService.createProduct()
+      dispatch(createProductSuccess(data?.success))
+    } catch (err) {
+      console.log(err)
+      createProductFailure()
     }
   }
 }

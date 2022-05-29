@@ -21,6 +21,17 @@ export const ProductsAdd: React.FC = () => {
     setOpen(!open)
   }
 
+  const [name, setName] = React.useState<string | null>(null)
+  const [description, setDescription] = React.useState<string | null>(null)
+  const [inStock, setInStock] = React.useState<boolean>(true)
+  const [sku, setSku] = React.useState<string | null>(null)
+  const [categoryId, setCategoryId] = React.useState<number | null>(null)
+  const [price, setPrice] = React.useState<number | null>(null)
+
+  function addNewProduct() {
+    console.log({ name, description, inStock, sku, categoryId, price })
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar open={open} toggleDrawer={toggleDrawer} title="Adicionar" />
@@ -38,7 +49,7 @@ export const ProductsAdd: React.FC = () => {
         }}
       >
         <Toolbar />
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 4, pb: 4 }}>
           <Box sx={{ display: 'flex', alignItens: 'center', marginBottom: 5 }}>
             <Box sx={{ flexGrow: 1 }}>
               <Typography
@@ -52,16 +63,35 @@ export const ProductsAdd: React.FC = () => {
           </Box>
           <Grid container spacing={3}>
             <Grid item xs={8}>
-              <ProductsAddFormEdit />
+              <ProductsAddFormEdit
+                name={name}
+                setName={setName}
+                description={description}
+                setDescription={setDescription}
+              />
             </Grid>
             <Grid item xs={4}>
-              <ProductsAddFormEdit2 />
-              <ProductsAddFormEdit3 />
-              <Button variant="contained">Criar produto</Button>
+              <ProductsAddFormEdit2
+                inStock={inStock}
+                setInStock={setInStock}
+                sku={sku}
+                setSku={setSku}
+                categoryId={categoryId}
+                setCategoryId={setCategoryId}
+              />
+              <ProductsAddFormEdit3 price={price} setPrice={setPrice} />
+              <Button
+                variant="contained"
+                size="large"
+                fullWidth
+                onClick={addNewProduct}
+              >
+                Criar produto
+              </Button>
             </Grid>
           </Grid>
-          <Copyright />
         </Container>
+        <Copyright />
       </Box>
     </Box>
   )

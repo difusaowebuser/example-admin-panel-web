@@ -10,11 +10,58 @@ import {
   InputLabel,
   MenuItem
 } from '@mui/material'
+import { useSelector, useDispatch } from 'react-redux'
 
-export const ProductsAddFormEdit2: React.FC = () => {
-  const [inStock, setInStock] = React.useState<boolean>(true)
-  const [sku, setSku] = React.useState<string | null>(null)
-  const [category, setCategory] = React.useState<number | null>(null)
+import { TaxonomyData, getTaxonomies, RootState } from '../../../redux'
+
+interface ProductsAddFormEdit2Props {
+  inStock: boolean
+  setInStock(stock: boolean): void
+  sku: string | null
+  setSku(sku: string): void
+  categoryId: number | null
+  setCategoryId(categoryId: number): void
+}
+export const ProductsAddFormEdit2 = ({
+  inStock,
+  setInStock,
+  sku,
+  setSku,
+  categoryId,
+  setCategoryId
+}: ProductsAddFormEdit2Props) => {
+  const { taxonomiesList } = useSelector(
+    (state: ReturnType<RootState>) => state.taxonomies
+  )
+  const dispatch = useDispatch()
+
+  const [loadingGetTaxonomies, setLoadingGetTaxonomies] = React.useState(false)
+
+  // const [inStock, setInStock] = React.useState<boolean>(true)
+  // const [sku, setSku] = React.useState<string | null>(null)
+  // const [category, setCategory] = React.useState<number | null>(null)
+  const [categoryList, setCategoryList] = React.useState<TaxonomyData[] | null>(
+    null
+  )
+
+  React.useEffect(() => {
+    async function onGetTaxonomies() {
+      if (loadingGetTaxonomies) {
+        return
+      }
+
+      setLoadingGetTaxonomies(true)
+      await dispatch(getTaxonomies())
+      setLoadingGetTaxonomies(false)
+    }
+    onGetTaxonomies()
+  }, [])
+
+  React.useEffect(() => {
+    if (taxonomiesList) {
+      setCategoryList(taxonomiesList)
+    }
+  }, [taxonomiesList])
 
   return (
     <Paper sx={{ width: '100%', mb: 3, padding: 3 }}>
@@ -40,13 +87,15 @@ export const ProductsAddFormEdit2: React.FC = () => {
           <InputLabel id="select-label-id-category">Categoria</InputLabel>
           <Select
             labelId="select-label-id-category"
-            value={category}
+            value={categoryId}
             label="Categoria"
-            onChange={event => setCategory(event.target.value)}
+            onChange={event => setCategoryId(event.target.value)}
           >
-            <MenuItem value={1}>Calças</MenuItem>
-            <MenuItem value={2}>Calçados</MenuItem>
-            <MenuItem value={3}>Roupas</MenuItem>
+            {categoryList?.map((category, index) => (
+              <MenuItem key={index} value={category.id}>
+                {category.name}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>

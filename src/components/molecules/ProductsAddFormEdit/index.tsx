@@ -1,9 +1,20 @@
 import * as React from 'react'
 import { Paper, TextField, Box, Input, Button, Typography } from '@mui/material'
 
-export const ProductsAddFormEdit: React.FC = () => {
-  const [name, setName] = React.useState<string | null>(null)
-  const [description, setDescription] = React.useState<string | null>(null)
+interface ProductsAddFormEditProps {
+  name: string | null
+  setName(name: string): void
+  description: string | null
+  setDescription(description: string): void
+}
+export const ProductsAddFormEdit = ({
+  name,
+  setName,
+  description,
+  setDescription
+}: ProductsAddFormEditProps) => {
+  // const [name, setName] = React.useState<string | null>(null)
+  // const [description, setDescription] = React.useState<string | null>(null)
   const [image, setImage] = React.useState<string | null>(null)
 
   return (

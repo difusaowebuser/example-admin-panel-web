@@ -50,7 +50,11 @@ export const ProductsList: React.FC = () => {
               </Typography>
             </Box>
             <Box sx={{ flexShrink: 0 }}>
-              <Button variant="contained" startIcon={<AddIcon />}>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                href="/produtos/adicionar/"
+              >
                 Novo Produto
               </Button>
             </Box>

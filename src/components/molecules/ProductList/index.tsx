@@ -4,9 +4,7 @@ import {
   Replay as ReplayIcon,
   MoreVert as MoreVertIcon,
   Delete as DeleteIcon,
-  Edit as EditIcon,
-  TableRows,
-  FormatListNumberedRtlOutlined
+  Edit as EditIcon
 } from '@mui/icons-material'
 import { visuallyHidden } from '@mui/utils'
 import { DateTime } from 'luxon'
@@ -18,17 +16,12 @@ import {
   TableContainer,
   TablePagination,
   TableSortLabel,
-  Switch,
   Toolbar,
-  TableRow,
   TableHead,
   Typography,
   Paper,
   Checkbox,
-  FormControlLabel,
   IconButton,
-  Tooltip,
-  Avatar,
   Menu,
   MenuItem,
   CircularProgress,
@@ -280,7 +273,7 @@ export function ProductList() {
   )
   const dispatch = useDispatch()
 
-  const [loadingGetProduct, setLoadingGetProduct] = React.useState(false)
+  const [loadingGetProducts, setLoadingGetProducts] = React.useState(false)
   const [loadingDeleteProducts, setLoadingDeleteProducts] =
     React.useState(false)
   const [rows, setRows] = React.useState<ProductData[] | null>(null)
@@ -391,14 +384,14 @@ export function ProductList() {
   }
 
   async function onGetProducts() {
-    if (loadingGetProduct) {
+    if (loadingGetProducts) {
       return
     }
     setSelecteds(null)
 
-    setLoadingGetProduct(true)
+    setLoadingGetProducts(true)
     await dispatch(getProducts())
-    setLoadingGetProduct(false)
+    setLoadingGetProducts(false)
   }
 
   React.useEffect(() => {
@@ -426,11 +419,10 @@ export function ProductList() {
 
   return (
     <>
-      {/* <Box sx={{ width: '100%' }}> */}
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
           numSelected={selecteds?.length ?? 0}
-          loading={loadingGetProduct}
+          loading={loadingGetProducts}
           onGetProducts={onGetProducts}
           handleRowCellDelete={handleRowCellDelete}
           selecteds={selecteds ?? []}
@@ -564,7 +556,6 @@ export function ProductList() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      {/* </Box> */}
     </>
   )
 }

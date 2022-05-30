@@ -14,6 +14,7 @@ import { SideBar } from '../../components/molecules/SideBar'
 import { ProductsAddFormEdit } from '../../components/molecules/ProductsAddFormEdit'
 import { ProductsAddFormEdit2 } from '../../components/molecules/ProductsAddFormEdit2'
 import { ProductsAddFormEdit3 } from '../../components/molecules/ProductsAddFormEdit3'
+import { createProduct } from '../../redux'
 
 export const ProductsAdd: React.FC = () => {
   const [open, setOpen] = React.useState(true)
@@ -24,12 +25,33 @@ export const ProductsAdd: React.FC = () => {
   const [name, setName] = React.useState<string | null>(null)
   const [description, setDescription] = React.useState<string | null>(null)
   const [inStock, setInStock] = React.useState<boolean>(true)
-  const [sku, setSku] = React.useState<string | null>(null)
+  const [images, setImages] = React.useState<string[] | null>(null)
+  const [sku, setSku] = React.useState<number | null>(null)
   const [categoryId, setCategoryId] = React.useState<number | null>(null)
   const [price, setPrice] = React.useState<number | null>(null)
 
-  function addNewProduct() {
-    console.log({ name, description, inStock, sku, categoryId, price })
+  const [loadingCreateProduct, setLoadingCreateProduct] = React.useState(false)
+
+  async function addNewProduct() {
+    if (loadingCreateProduct) {
+      return
+    }
+
+    if (!!name && !!sku && !!price && !!categoryId) {
+      setLoadingCreateProduct(true)
+      await dispatch(
+        createProduct({
+          name,
+          description,
+          stock: inStock,
+          images,
+          sku,
+          categoryId,
+          price
+        })
+      )
+      setLoadingCreateProduct(false)
+    }
   }
 
   return (

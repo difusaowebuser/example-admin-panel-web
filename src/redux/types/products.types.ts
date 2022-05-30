@@ -9,12 +9,28 @@ export interface ProductData {
   category: string
 }
 
+export interface CreateProductData {
+  name: string
+  description: string | null
+  images: string[] | null
+  sku: number | null
+  stock: boolean
+  price: number
+  categoryId: number | null
+}
+
 export const GET_PRODUCTS = 'GET_PRODUCTS'
+export const CREATE_PRODUCT = 'CREATE_PRODUCT'
 export const DELETE_PRODUCTS = 'DELETE_PRODUCTS'
 
 interface GetProductsAction {
   type: typeof GET_PRODUCTS
   payload: ProductData[] | null
+}
+
+interface CreateProductsAction {
+  type: typeof CREATE_PRODUCT
+  payload: CreateProductData | null
 }
 
 interface DeleteProductsAction {
@@ -27,4 +43,7 @@ export interface ProductsState {
   deletedProducts: true | null
 }
 
-export type ProductsActionTypes = GetProductsAction | DeleteProductsAction
+export type ProductsActionTypes =
+  | GetProductsAction
+  | CreateProductsAction
+  | DeleteProductsAction

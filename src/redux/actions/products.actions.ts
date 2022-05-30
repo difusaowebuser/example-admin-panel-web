@@ -6,7 +6,8 @@ import {
   ProductsActionTypes,
   GET_PRODUCTS,
   CREATE_PRODUCT,
-  DELETE_PRODUCTS
+  DELETE_PRODUCTS,
+  CreateProductData
 } from '../types'
 import { productsService } from '../../services'
 import { RootState } from '../store'
@@ -21,7 +22,7 @@ const getProductsFailure: ActionCreator<ProductsActionTypes> = () => {
 }
 
 const createProductSuccess: ActionCreator<ProductsActionTypes> = (
-  success: ProductData[]
+  success: CreateProductData
 ) => {
   return { type: CREATE_PRODUCT, payload: success }
 }
@@ -48,16 +49,17 @@ export function getProducts() {
   }
 }
 
-export function createProduct() {
-  return async dispatch => {
-    try {
-      const { data } = await productsService.createProduct()
-      dispatch(createProductSuccess(data?.success))
-    } catch (err) {
-      console.log(err)
-      createProductFailure()
-    }
-  }
+export function createProduct(product: CreateProductData) {
+  console.log(product)
+  // return async dispatch => {
+  //   try {
+  //     const { data } = await productsService.createProduct(product)
+  //     dispatch(createProductSuccess(data?.success))
+  //   } catch (err) {
+  //     console.log(err)
+  //     createProductFailure()
+  //   }
+  // }
 }
 
 export function deleteProducts(ids: number[]) {

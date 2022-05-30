@@ -17,8 +17,8 @@ import { TaxonomyData, getTaxonomies, RootState } from '../../../redux'
 interface ProductsAddFormEdit2Props {
   inStock: boolean
   setInStock(stock: boolean): void
-  sku: string | null
-  setSku(sku: string): void
+  sku: number | null
+  setSku(sku: number): void
   categoryId: number | null
   setCategoryId(categoryId: number): void
 }
@@ -70,7 +70,7 @@ export const ProductsAddFormEdit2 = ({
           control={
             <Switch
               checked={inStock}
-              onChange={event => setInStock(event.target.checked)}
+              onChange={event => setInStock(Boolean(event.target.checked))}
             />
           }
           label="Em estoque"
@@ -81,7 +81,7 @@ export const ProductsAddFormEdit2 = ({
           variant="outlined"
           sx={{ mb: 3 }}
           value={sku}
-          onChange={event => setSku(event.target.value)}
+          onChange={event => setSku(Number(event.target.value))}
         />
         <FormControl fullWidth>
           <InputLabel id="select-label-id-category">Categoria</InputLabel>
@@ -89,7 +89,7 @@ export const ProductsAddFormEdit2 = ({
             labelId="select-label-id-category"
             value={categoryId}
             label="Categoria"
-            onChange={event => setCategoryId(event.target.value)}
+            onChange={event => setCategoryId(Number(event.target.value))}
           >
             {categoryList?.map((category, index) => (
               <MenuItem key={index} value={category.id}>

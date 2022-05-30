@@ -21,13 +21,13 @@ const getProductsFailure: ActionCreator<ProductsActionTypes> = () => {
   return { type: GET_PRODUCTS, payload: null }
 }
 
-const createProductSuccess: ActionCreator<ProductsActionTypes> = (
-  success: CreateProductData
-) => {
-  return { type: CREATE_PRODUCT, payload: success }
+const createProductSuccess: ActionCreator<ProductsActionTypes> = (success: {
+  product_id: number
+}) => {
+  return { type: CREATE_PRODUCT, payload: { success, failure: null } }
 }
 const createProductFailure: ActionCreator<ProductsActionTypes> = () => {
-  return { type: CREATE_PRODUCT, payload: null }
+  return { type: CREATE_PRODUCT, payload: { success: null, failure: true } }
 }
 
 const deleteProductsSuccess: ActionCreator<ProductsActionTypes> = () => {
@@ -50,16 +50,15 @@ export function getProducts() {
 }
 
 export function createProduct(product: CreateProductData) {
-  console.log(product)
-  // return async dispatch => {
-  //   try {
-  //     const { data } = await productsService.createProduct(product)
-  //     dispatch(createProductSuccess(data?.success))
-  //   } catch (err) {
-  //     console.log(err)
-  //     createProductFailure()
-  //   }
-  // }
+  return async dispatch => {
+    try {
+      const { data } = await productsService.createProduct(product)
+      dispatch(createProductSuccess(data?.success))
+    } catch (err) {
+      console.log(err)
+      dispatch(createProductFailure())
+    }
+  }
 }
 
 export function deleteProducts(ids: number[]) {

@@ -18,7 +18,11 @@ export const ProductsAddFormEdit3 = ({
           label="Preço"
           variant="outlined"
           value={price}
-          onChange={event => setPrice(event.target.value)}
+          onChange={event => setPrice(Number(event.target.value))}
+          type="number"
+          inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+          helperText={price ? '' : 'O preço é obrigatório.'}
+          error={!price}
         />
       </Box>
     </Paper>

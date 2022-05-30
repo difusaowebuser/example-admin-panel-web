@@ -13,7 +13,7 @@ async function createProduct({
   name,
   description,
   stock,
-  image,
+  images,
   sku,
   price,
   categoryId
@@ -22,8 +22,8 @@ async function createProduct({
     params: {
       name,
       description,
-      stock,
-      image,
+      stock: stock ? 1 : 0,
+      images,
       sku,
       price,
       category_id: categoryId

@@ -24,15 +24,17 @@ export const ProductsAddFormEdit = ({
           label="Nome do Produto"
           variant="outlined"
           value={name}
-          onChange={event => setName(event.target.value)}
+          onChange={event => setName(String(event.target.value))}
           sx={{ mb: 3 }}
+          helperText={name ? '' : 'O nome é obrigatório.'}
+          error={!name}
         />
         <Box>
           <Typography sx={{ mb: 1 }}>Descrição</Typography>
           <TextField
             multiline
             value={description}
-            onChange={event => setDescription(event.target.value)}
+            onChange={event => setDescription(String(event.target.value))}
             rows={8}
             fullWidth
             sx={{ mb: 3 }}

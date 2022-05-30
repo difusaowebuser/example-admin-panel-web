@@ -30,7 +30,10 @@ interface GetProductsAction {
 
 interface CreateProductsAction {
   type: typeof CREATE_PRODUCT
-  payload: CreateProductData | null
+  payload: {
+    success: { product_id: number } | null
+    failure: true | null
+  }
 }
 
 interface DeleteProductsAction {
@@ -40,6 +43,10 @@ interface DeleteProductsAction {
 
 export interface ProductsState {
   productsList: ProductData[] | null
+  createProductReturn: {
+    success: { product_id: number } | null
+    failure: true | null
+  }
   deletedProducts: true | null
 }
 

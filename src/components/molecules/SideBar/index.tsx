@@ -9,7 +9,7 @@ import {
 import { styled } from '@mui/material/styles'
 import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material'
 
-import { MainListItems } from '../../ListItems'
+import { MainListItems } from '../../atoms/ListItems'
 
 const drawerWidth = 240
 

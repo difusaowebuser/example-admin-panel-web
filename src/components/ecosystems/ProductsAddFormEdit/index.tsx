@@ -1,5 +1,17 @@
 import * as React from 'react'
-import { Paper, TextField, Box, Input, Button, Typography } from '@mui/material'
+import {
+  Paper,
+  TextField,
+  Box,
+  Input,
+  Button,
+  Typography,
+  Modal
+} from '@mui/material'
+
+import { UploadImagePreview } from '../../atoms/UploadImagePreview'
+import { LibraryModal } from '../../organims/LibraryModal'
+import ImagePlaceholderUploadFile from '../../../assets/images/ImageUploadPlaceholder.png'
 
 interface ProductsAddFormEditProps {
   name: string | null
@@ -16,6 +28,7 @@ export const ProductsAddFormEdit = ({
   // const [name, setName] = React.useState<string | null>(null)
   // const [description, setDescription] = React.useState<string | null>(null)
   const [image, setImage] = React.useState<string | null>(null)
+  const [modalOpen, setModalOpen] = React.useState(false)
 
   return (
     <Paper sx={{ width: '100%', mb: 2, padding: 3 }}>
@@ -42,20 +55,19 @@ export const ProductsAddFormEdit = ({
         </Box>
         <Box>
           <Typography sx={{ mb: 1 }}>Imagem</Typography>
-          <label htmlFor="contained-button-file">
-            <Input
-              accept="image/*"
-              id="contained-button-file"
-              multiple
-              type="file"
-              value={image}
-              onChange={event => setImage(event.target.value)}
-              sx={{ display: 'none' }}
+          <Box>
+            <UploadImagePreview
+              alt="Placeholder"
+              url={ImagePlaceholderUploadFile}
+              open={modalOpen}
+              setOpen={setModalOpen}
             />
-            <Button variant="contained" component="span">
-              Upload
-            </Button>
-          </label>
+            <LibraryModal
+              open={modalOpen}
+              setOpen={() => setModalOpen(false)}
+              multiple={false}
+            />
+          </Box>
         </Box>
       </Box>
     </Paper>

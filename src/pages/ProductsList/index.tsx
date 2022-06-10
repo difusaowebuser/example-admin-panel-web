@@ -11,8 +11,8 @@ import { Copyright } from '../../components/atoms/Copyright'
 
 import { Add as AddIcon } from '@mui/icons-material'
 
-import { ProductList } from '../../components/molecules/ProductList'
-import { AppBar } from '../../components/AppBar'
+import { ProductList } from '../../components/ecosystems/ProductList'
+import { AppBar } from '../../components/atoms/AppBar'
 import { SideBar } from '../../components/molecules/SideBar'
 
 export const ProductsList: React.FC = () => {

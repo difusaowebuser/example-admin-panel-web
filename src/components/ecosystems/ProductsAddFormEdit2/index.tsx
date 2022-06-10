@@ -17,8 +17,8 @@ import { TaxonomyData, getTaxonomies, RootState } from '../../../redux'
 interface ProductsAddFormEdit2Props {
   inStock: boolean
   setInStock(stock: boolean): void
-  sku: number | null
-  setSku(sku: number): void
+  sku: string | null
+  setSku(sku: string): void
   categoryId: number | null
   setCategoryId(categoryId: number): void
 }

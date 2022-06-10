@@ -12,11 +12,11 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 
 import { Copyright } from '../../components/atoms/Copyright'
-import { AppBar } from '../../components/AppBar'
+import { AppBar } from '../../components/atoms/AppBar'
 import { SideBar } from '../../components/molecules/SideBar'
-import { ProductsAddFormEdit } from '../../components/molecules/ProductsAddFormEdit'
-import { ProductsAddFormEdit2 } from '../../components/molecules/ProductsAddFormEdit2'
-import { ProductsAddFormEdit3 } from '../../components/molecules/ProductsAddFormEdit3'
+import { ProductsAddFormEdit } from '../../components/ecosystems/ProductsAddFormEdit'
+import { ProductsAddFormEdit2 } from '../../components/ecosystems/ProductsAddFormEdit2'
+import { ProductsAddFormEdit3 } from '../../components/ecosystems/ProductsAddFormEdit3'
 import { createProduct, RootState } from '../../redux'
 
 export const ProductsAdd: React.FC = () => {

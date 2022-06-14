@@ -9,7 +9,7 @@ import {
 import { styled } from '@mui/material/styles'
 import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material'
 
-import { MainListItems } from '../../atoms/ListItems'
+import { ListItems } from '../../atoms/ListItems'
 
 const drawerWidth = 240
 
@@ -44,6 +44,8 @@ interface SideBarProps {
   toggleDrawer(): void
 }
 export const SideBar = ({ open, toggleDrawer }: SideBarProps) => {
+  const [activePage, setActivePage] = React.useState('dashboard')
+
   return (
     <Drawer variant="permanent" open={open}>
       <Toolbar
@@ -60,7 +62,7 @@ export const SideBar = ({ open, toggleDrawer }: SideBarProps) => {
       </Toolbar>
       <Divider />
       <List component="nav">
-        <MainListItems />
+        <ListItems activePage={activePage} setActivePage={setActivePage} />
       </List>
     </Drawer>
   )

@@ -2,7 +2,7 @@ import { AxiosResponse } from 'axios'
 
 import { api } from './api'
 import {
-  AccessLogInParameters,
+  GetLogInParametersService,
   AccessSignUpParameters,
   AccessResetPasswordParameters,
   AccessResetPasswordVerifyCodeParameters,
@@ -10,29 +10,22 @@ import {
 } from '../types'
 
 export const accessService = {
+  getLogIn,
+  getLogOut,
   getIsAuthenticated,
-  accessLogIn,
   accessSignUp,
-  deleteLogOut,
   accessResetPassword,
   accessResetPasswordVerifyCode,
   accessResetPasswordChangePassword
 }
-
-async function getIsAuthenticated(): Promise<AxiosResponse> {
-  return await api.get('access/authenticated')
+async function getLogIn({
+  email,
+  password
+}: GetLogInParametersService): Promise<AxiosResponse> {
+  return await api.get('access/login', { params: { email, password } })
 }
-
-async function accessLogIn({
-  userLogin,
-  userPass
-}: AccessLogInParameters): Promise<AxiosResponse> {
-  return await api.get('access', {
-    params: {
-      user_login: userLogin,
-      user_pass: userPass
-    }
-  })
+async function getLogOut(): Promise<AxiosResponse> {
+  return await api.get('access/logout')
 }
 
 async function accessSignUp({
@@ -49,10 +42,6 @@ async function accessSignUp({
       display_name: displayName
     }
   })
-}
-
-async function deleteLogOut(): Promise<AxiosResponse> {
-  return await api.get('access/delete')
 }
 
 async function accessResetPassword({
@@ -80,4 +69,7 @@ async function accessResetPasswordChangePassword({
   return await api.get('access/reset-password/change-password', {
     params: { token, user_pass: password }
   })
+}
+async function getIsAuthenticated(): Promise<AxiosResponse> {
+  return await api.get('access/authenticated')
 }

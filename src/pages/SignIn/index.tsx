@@ -7,21 +7,28 @@ import {
   Container,
   Paper
 } from '@mui/material'
+import { useDispatch } from 'react-redux'
 
 import { Copyright } from '../../components/atoms/Copyright'
+import { getLogIn } from '../../redux'
 
 export function SignIn() {
-  const [userLogin, setUserLogin] = React.useState<string | null>(
+  const dispatch = useDispatch()
+  const [isLoadingSignIn, setIsLoadingSignIn] = React.useState(false)
+  const [email, setEmail] = React.useState<string | null>(
     'johnsistema@gmail.com'
   )
-  const [userPass, setUserPass] = React.useState<string | null>(
-    'johnsistemaPass123'
+  const [password, setPassword] = React.useState<string | null>(
+    'johnsistemaPASS123'
   )
 
-  function handleSignIn() {
-    // if (userLogin && userPass) {
-    //   accessLogIn({ userLogin, userPass })
-    // }
+  async function handleSignIn() {
+    if (email && password) {
+      setIsLoadingSignIn(true)
+      await dispatch(getLogIn({ email, password }))
+
+      setIsLoadingSignIn(false)
+    }
   }
 
   return (
@@ -60,22 +67,22 @@ export function SignIn() {
                 required
                 fullWidth
                 label="Nome de usuário ou email"
-                name="userLogin"
+                name="email"
                 autoComplete="email"
                 autoFocus
-                onChange={e => setUserLogin(e.target.value)}
-                value={userLogin}
+                onChange={e => setEmail(String(e.target.value))}
+                value={email}
               />
               <TextField
                 margin="normal"
                 required
                 fullWidth
-                name="userPassword"
+                name="passwordword"
                 label="Senha"
                 type="password"
                 autoComplete="current-password"
-                onChange={e => setUserPass(e.target.value)}
-                value={userPass}
+                onChange={e => setPassword(String(e.target.value))}
+                value={password}
               />
               <Button
                 type="submit"
@@ -83,7 +90,7 @@ export function SignIn() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 onClick={handleSignIn}
-                disabled={!userLogin || !userPass}
+                disabled={isLoadingSignIn || !email || !password}
               >
                 Acessar
               </Button>

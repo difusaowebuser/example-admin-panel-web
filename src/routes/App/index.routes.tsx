@@ -5,6 +5,8 @@ import { NotFound } from '../../pages/404'
 import { Dashboard } from '../../pages/Dashboard'
 import { ProductsList } from '../../pages/ProductsList'
 import { ProductsAdd } from '../../pages/ProductsAdd'
+import { UsersList } from '../../pages/UsersList'
+import { UsersAdd } from '../../pages/UsersAdd'
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -12,6 +14,8 @@ export const AppRoutes: React.FC = () => {
       <Route path="/" element={<Dashboard />} />
       <Route path="/produtos/" element={<ProductsList />} />
       <Route path="/produtos/adicionar/" element={<ProductsAdd />} />
+      <Route path="/usuarios/" element={<UsersList />} />
+      <Route path="/usuarios/adicionar/" element={<UsersAdd />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

@@ -1,28 +1,16 @@
-import { ReturnErrorInterface, ReturnOnlyErrorInterface } from './common.types'
-
-export interface AccessActionGetCurrentTokenParameters {
-  token: string
+export interface GetLogInParametersService {
+  email: string
+  password: string
 }
-
-export interface AccessActionIsAuthenticatedParameters {
-  isAuthenticated: boolean
-}
-
-export interface AccessLogInParameters {
-  userLogin: string
-  userPass: string
-}
-export interface GetLogInReturnServiceInterface {
+export interface GetLogInParametersReducer {
   token: string
   user: {
     id: number
-    user_login: string
-    display_name: string
-    user_email: string
+    displayName: string
   }
 }
-export interface GetLogInSuccessReturnActionInterface {
-  token: string
+export interface GetLogOutReturnServiceInterface {
+  revoked: boolean
 }
 
 export interface AccessSignUpParameters {
@@ -33,10 +21,6 @@ export interface AccessSignUpParameters {
 }
 export interface PostSignUpReturnServiceInterface {
   created: boolean
-}
-
-export interface DeleteLogOutReturnServiceInterface {
-  revoked: boolean
 }
 
 export interface AccessResetPasswordParameters {
@@ -55,10 +39,15 @@ export interface AccessServiceResetPasswordChangePasswordParameters {
   password: string
 }
 
-export const ACCESS_GET_CURRENT_TOKEN = 'ACCESS_GET_CURRENT_TOKEN'
+export interface AccessActionIsAuthenticatedParameters {
+  isAuthenticated: boolean
+}
+
+export const GET_LOG_IN = 'GET_LOG_IN'
+export const GET_LOCAL_STORAGE = 'GET_LOCAL_STORAGE'
+export const GET_LOG_OUT = 'GET_LOG_OUT'
+
 export const ACCESS_GET_IS_AUTHENTICATED = 'ACCESS_GET_IS_AUTHENTICATED'
-export const GET_SIGN_IN = 'GET_SIGN_IN'
-export const DELETE_LOG_OUT = 'DELETE_LOG_OUT'
 export const ACCESS_RESET_PASSWORD = 'ACCESS_RESET_PASSWORD'
 export const ACCESS_RESET_PASSWORD_VERIFY_CODE =
   'ACCESS_RESET_PASSWORD_VERIFY_CODE'
@@ -69,27 +58,31 @@ export const ACCESS_SIGN_UP = 'ACCESS_SIGN_UP'
 export const ACCESS_SIGN_UP_VERIFY_CODE = 'ACCESS_SIGN_UP_VERIFY_CODE'
 export const ACCESS_SIGN_UP_FINISHED = 'ACCESS_SIGN_UP_FINISHED'
 
-interface AccessActionGetCurrentToken {
-  type: typeof ACCESS_GET_CURRENT_TOKEN
-  payload: AccessActionGetCurrentTokenParameters | null
+interface GetLogInAction {
+  type: typeof GET_LOG_IN
+  payload: {
+    success: GetLogInParametersReducer | null
+    failure: boolean | null
+  }
+}
+interface GetLocalStorageAction {
+  type: typeof GET_LOCAL_STORAGE
+  payload: {
+    success: GetLogInParametersReducer | null
+    failure: boolean | null
+  }
+}
+interface GetLogOutAction {
+  type: typeof GET_LOG_OUT
+  payload: {
+    success: boolean | null
+    failure: boolean | null
+  }
 }
 
 interface AccessActionGetIsAuthenticated {
   type: typeof ACCESS_GET_IS_AUTHENTICATED
   payload: AccessActionIsAuthenticatedParameters | null
-}
-
-interface GetLogInAction {
-  type: typeof GET_SIGN_IN
-  payload: {
-    success: GetLogInSuccessReturnActionInterface | null
-    failure: ReturnErrorInterface | null
-  }
-}
-
-interface DeleteLogOutAction {
-  type: typeof DELETE_LOG_OUT
-  payload: ReturnOnlyErrorInterface
 }
 
 interface AccessResetPassword {
@@ -124,11 +117,17 @@ interface AccessActionSignUpFinished {
 }
 
 export interface AccessState {
+  token: string | null
+  user: {
+    id: number
+    displayName: string
+  } | null
+
   currentToken: string | null
   isAuthenticated: boolean | null
-  getCurrentTokenError: ReturnErrorInterface | null
-  getLogInError: ReturnErrorInterface | null
-  deleteLogOutError: ReturnErrorInterface | null
+  getCurrentTokenError: boolean | null
+  getLogInError: boolean | null
+  getLogOutError: boolean | null
 
   resetPasswordVerifyCodeActived: boolean | null
   resetPasswordChangePasswordActived: boolean | null
@@ -140,11 +139,10 @@ export interface AccessState {
 }
 
 export type AccessActionTypes =
-  | AccessActionGetCurrentToken
-  | AccessActionGetIsAuthenticated
   | GetLogInAction
-  | DeleteLogOutAction
-  | DeleteLogOutAction
+  | GetLocalStorageAction
+  | GetLogOutAction
+  | AccessActionGetIsAuthenticated
   | AccessResetPassword
   | AccessResetPasswordVerifyCode
   | AccessResetPasswordChangePassword

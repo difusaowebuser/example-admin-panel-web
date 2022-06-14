@@ -1,15 +1,32 @@
 import * as React from 'react'
 import { Box, CircularProgress } from '@mui/material'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { AccessRoutes } from './Access/index.routes'
 import { AppRoutes } from './App/index.routes'
-import { Test } from '../pages/Test'
+import { RootState, getLocalStorage } from '../redux'
+import { Alert } from '../components/atoms/Alert'
 
-export const Routes: React.FC = () => {
-  const loading = false
-  const signed = true
+export const Routes = () => {
+  const { token } = useSelector((state: ReturnType<RootState>) => state.access)
+  const dispatch = useDispatch()
 
-  if (loading) {
+  const [loadingGetLocalStorage, setLoadingGetLocalStorage] =
+    React.useState(false)
+
+  React.useEffect(() => {
+    async function onGetLocalStorage() {
+      if (loadingGetLocalStorage) {
+        return
+      }
+      setLoadingGetLocalStorage(true)
+      await dispatch(getLocalStorage())
+      setLoadingGetLocalStorage(false)
+    }
+    onGetLocalStorage()
+  }, [])
+
+  if (loadingGetLocalStorage) {
     return (
       <Box sx={{ display: 'flex' }}>
         <CircularProgress />
@@ -17,5 +34,10 @@ export const Routes: React.FC = () => {
     )
   }
 
-  return signed ? <AppRoutes /> : <AccessRoutes />
+  return (
+    <>
+      {token ? <AppRoutes /> : <AccessRoutes />}
+      <Alert />
+    </>
+  )
 }

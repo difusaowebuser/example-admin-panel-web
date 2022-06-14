@@ -1,10 +1,10 @@
 import {
   AccessState,
   AccessActionTypes,
-  ACCESS_GET_CURRENT_TOKEN,
+  GET_LOG_IN,
+  GET_LOCAL_STORAGE,
   ACCESS_GET_IS_AUTHENTICATED,
-  GET_SIGN_IN,
-  DELETE_LOG_OUT,
+  GET_LOG_OUT,
   ACCESS_RESET_PASSWORD,
   ACCESS_RESET_PASSWORD_VERIFY_CODE,
   ACCESS_RESET_PASSWORD_CHANGE_PASSWORD,
@@ -15,11 +15,14 @@ import {
 } from '../types'
 
 const initialState: AccessState = {
+  token: null,
+  user: null,
+
   currentToken: null,
   isAuthenticated: null,
   getCurrentTokenError: null,
   getLogInError: null,
-  deleteLogOutError: null,
+  getLogOutError: null,
 
   resetPasswordVerifyCodeActived: null,
   resetPasswordToken: null,
@@ -35,12 +38,28 @@ export function accessReducer(
   action: AccessActionTypes
 ): AccessState {
   switch (action.type) {
-    case ACCESS_GET_CURRENT_TOKEN: {
+    case GET_LOG_IN: {
       return {
         ...state,
-        currentToken: action.payload?.token ?? null
+        token: action.payload.success?.token ?? null,
+        user: action.payload.success?.user ?? null
       }
     }
+    case GET_LOCAL_STORAGE: {
+      return {
+        ...state,
+        token: action.payload.success?.token ?? null,
+        user: action.payload.success?.user ?? null
+      }
+    }
+    case GET_LOG_OUT: {
+      return {
+        ...state,
+        token: null,
+        user: null
+      }
+    }
+
     case ACCESS_GET_IS_AUTHENTICATED: {
       return {
         ...state,
@@ -48,13 +67,6 @@ export function accessReducer(
         currentToken: action.payload?.isAuthenticated
           ? state.currentToken
           : null
-      }
-    }
-    case GET_SIGN_IN: {
-      return {
-        ...state,
-        currentToken: action.payload.success?.token ?? null,
-        getLogInError: action.payload.failure
       }
     }
     case ACCESS_SIGN_UP: {
@@ -74,14 +86,6 @@ export function accessReducer(
         ...state,
         signUpVerifyCodeActived: null,
         signUpFinishedActived: null
-      }
-    }
-    case DELETE_LOG_OUT: {
-      return {
-        ...state,
-        currentToken: null,
-        isAuthenticated: null,
-        deleteLogOutError: action.payload.failure
       }
     }
     case ACCESS_RESET_PASSWORD: {

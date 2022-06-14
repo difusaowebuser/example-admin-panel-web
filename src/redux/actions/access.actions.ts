@@ -1,20 +1,18 @@
 import axios, { AxiosError } from 'axios'
 import { ActionCreator, Dispatch } from 'redux'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import {
   AccessActionTypes,
-  GET_SIGN_IN,
-  AccessLogInParameters,
-  GetLogInSuccessReturnActionInterface,
+  GET_LOG_IN,
+  GetLogInParametersService,
+  GetLogInParametersReducer,
+  GET_LOCAL_STORAGE,
   ACCESS_SIGN_UP,
   AccessSignUpParameters,
-  DELETE_LOG_OUT,
+  GET_LOG_OUT,
   AccessResetPasswordParameters,
   ACCESS_RESET_PASSWORD,
-  AccessActionGetCurrentTokenParameters,
   AccessActionIsAuthenticatedParameters,
-  ACCESS_GET_CURRENT_TOKEN,
   ACCESS_GET_IS_AUTHENTICATED,
   AccessResetPasswordVerifyCodeParameters,
   ACCESS_RESET_PASSWORD_VERIFY_CODE,
@@ -25,36 +23,36 @@ import {
 import { accessService } from '../../services'
 import { api } from '../../services/api'
 import { RootState } from '../store'
+import { setAlert } from './alerts.actions'
 
-const accessActionGetCurrentToken: ActionCreator<AccessActionTypes> = (
-  payload: AccessActionGetCurrentTokenParameters
+const getLogInSuccess: ActionCreator<AccessActionTypes> = (
+  success: GetLogInParametersReducer
 ) => {
-  return { type: ACCESS_GET_CURRENT_TOKEN, payload }
+  return { type: GET_LOG_IN, payload: { success, failure: null } }
 }
-
-const accessActionGetIsAuthenticated: ActionCreator<AccessActionTypes> = (
-  payload: AccessActionIsAuthenticatedParameters
+const getLogInFailure: ActionCreator<AccessActionTypes> = () => {
+  return { type: GET_LOG_IN, payload: { success: null, failure: true } }
+}
+const getLocalStorageSuccess: ActionCreator<AccessActionTypes> = (
+  success: GetLogInParametersReducer
 ) => {
-  return { type: ACCESS_GET_IS_AUTHENTICATED, payload }
+  return { type: GET_LOCAL_STORAGE, payload: { success, failure: null } }
 }
-const accessActionGetIsAuthenticatedFailure: ActionCreator<
-  AccessActionTypes
-> = () => {
-  return { type: ACCESS_GET_IS_AUTHENTICATED, payload: null }
+const getLocalStorageFailure: ActionCreator<AccessActionTypes> = () => {
+  return {
+    type: GET_LOCAL_STORAGE,
+    payload: { success: null, failure: true }
+  }
 }
-
-const accessActionLogIn: ActionCreator<AccessActionTypes> = (
-  success: GetLogInSuccessReturnActionInterface
-) => {
-  return { type: GET_SIGN_IN, payload: { success, failure: null } }
+const getLogOutSuccess: ActionCreator<AccessActionTypes> = () => {
+  return { type: GET_LOG_OUT, payload: { success: true, failure: null } }
+}
+const getLogOutFailure: ActionCreator<AccessActionTypes> = () => {
+  return { type: GET_LOG_OUT, payload: { success: null, failure: true } }
 }
 
 const accessActionSignUp: ActionCreator<AccessActionTypes> = () => {
   return { type: ACCESS_SIGN_UP }
-}
-
-const deleteLogOutSuccess: ActionCreator<AccessActionTypes> = () => {
-  return { type: DELETE_LOG_OUT, payload: { failure: null } }
 }
 
 const accessActionResetPassword: ActionCreator<AccessActionTypes> = () => {
@@ -88,67 +86,40 @@ const accessActionResetPasswordFinished: ActionCreator<
   return { type: ACCESS_RESET_PASSWORD_FINISHED }
 }
 
-export function accessGetCurrentToken() {
-  return async dispatch => {
-    try {
-      let token: string | null = null
-      const storageToken = await AsyncStorage.getItem(
-        '@PosicionamentoAuth:token'
-      )
-      if (storageToken) {
-        token = storageToken
-        api.defaults.headers.Authorization = `Bearer ${token}`
-      }
-
-      dispatch(accessActionGetCurrentToken({ token }))
-    } catch (err) {
-      const returnError = {
-        status: 500,
-        message: 'Error access get current token.'
-      }
-
-      dispatch(setNotification(returnError.message))
-    }
-  }
+const accessActionGetIsAuthenticated: ActionCreator<AccessActionTypes> = (
+  payload: AccessActionIsAuthenticatedParameters
+) => {
+  return { type: ACCESS_GET_IS_AUTHENTICATED, payload }
+}
+const accessActionGetIsAuthenticatedFailure: ActionCreator<
+  AccessActionTypes
+> = () => {
+  return { type: ACCESS_GET_IS_AUTHENTICATED, payload: null }
 }
 
-export function accessGetIsAuthenticated() {
+export function getLogIn({ email, password }: GetLogInParametersService) {
   return async dispatch => {
     try {
-      console.log('accessGetIsAuthenticated')
-      await accessService.getIsAuthenticated()
-
-      dispatch(accessActionGetIsAuthenticated({ isAuthenticated: true }))
-    } catch (err) {
-      console.log('accessGetIsAuthenticatedFailure')
-      delete api.defaults.headers.Authorization
-      await AsyncStorage.clear()
-      dispatch(accessActionGetIsAuthenticatedFailure())
-    }
-  }
-}
-
-export function accessLogIn({ userLogin, userPass }: AccessLogInParameters) {
-  return async dispatch => {
-    try {
-      const { data } = await accessService.accessLogIn({ userLogin, userPass })
+      const { data } = await accessService.getLogIn({ email, password })
+      console.log(data)
       const token = data?.success?.token
       const user = {
         id: data?.success?.user?.id,
-        userLogin: data?.success?.user?.user_login,
-        displayName: data?.success?.user?.display_name,
-        userEmail: data?.success?.user?.user_email
+        displayName: data?.success?.user?.display_name
       }
 
-      api.defaults.headers.Authorization = `Bearer ${token}`
+      api.defaults.headers.common.Authorization = `Bearer ${token}`
 
-      await AsyncStorage.multiSet([
-        ['@PosicionamentoAuth:token', token],
-        ['@PosicionamentoAuth:user', JSON.stringify(user)]
-      ])
+      await localStorage.setItem('@PosicionamentoAuth:token', token)
+      await localStorage.setItem(
+        '@PosicionamentoAuth:user',
+        JSON.stringify(user)
+      )
 
-      dispatch(accessActionLogIn({ token }))
+      dispatch(getLogInSuccess({ token, user }))
     } catch (err) {
+      console.log(err)
+
       let status: number | null = null
 
       if (axios.isAxiosError(err)) {
@@ -158,15 +129,63 @@ export function accessLogIn({ userLogin, userPass }: AccessLogInParameters) {
 
       switch (status) {
         case 404:
-          dispatch(setNotification('logIn.error.404'))
+          dispatch(
+            dispatch(
+              setAlert({ type: 'error', message: 'Usuário não encontrado!' })
+            )
+          )
           break
         case 403:
-          dispatch(setNotification('logIn.error.403'))
+          dispatch(
+            dispatch(setAlert({ type: 'warning', message: 'Senha incorreta.' }))
+          )
           break
         default:
-          dispatch(setNotification('index.error.0'))
+          dispatch(
+            setAlert({ type: 'error', message: 'Erro ao desconhecido...' })
+          )
           break
       }
+
+      getLogInFailure()
+    }
+  }
+}
+export function getLocalStorage() {
+  return async dispatch => {
+    try {
+      let token: string | null = null
+      let user: { id: number; displayName: string } | null = null
+      const storageToken = await localStorage.getItem(
+        '@PosicionamentoAuth:token'
+      )
+      const storageUser = await localStorage.getItem('@PosicionamentoAuth:user')
+      if (storageToken && storageUser) {
+        token = storageToken
+        user = JSON.parse(storageUser)
+
+        api.defaults.headers.common.Authorization = `Bearer ${token}`
+      }
+
+      dispatch(getLocalStorageSuccess({ token, user }))
+    } catch (err) {
+      console.log(err)
+      getLocalStorageFailure()
+    }
+  }
+}
+export function getLogOut() {
+  return async (dispatch: Dispatch) => {
+    try {
+      const { data } = await accessService.getLogOut()
+      console.log(data)
+      await localStorage.clear()
+      delete api.defaults.headers.common.Authorization
+
+      dispatch(getLogOutSuccess())
+    } catch (err) {
+      console.log(err)
+      getLogOutFailure()
     }
   }
 }
@@ -203,34 +222,6 @@ export function accessSignUp({
           dispatch(setNotification('index.error.0'))
           break
       }
-    }
-  }
-}
-
-export function deleteLogOut() {
-  return async (dispatch: Dispatch) => {
-    try {
-      dispatch(request())
-
-      await accessService.deleteLogOut()
-      delete api.defaults.headers.Authorization
-      await AsyncStorage.clear()
-
-      dispatch(deleteLogOutSuccess())
-    } catch (err) {
-      const returnError = {
-        status: 500,
-        message: 'Error when log out.'
-      }
-      if (axios.isAxiosError(err)) {
-        err as AxiosError
-        returnError.status = err.response?.status ?? returnError.status
-        returnError.message =
-          err.response?.data?.failure?.message ?? returnError.message
-      }
-
-      setNotification(returnError.message)
-      dispatch(failure(returnError.message))
     }
   }
 }
@@ -327,5 +318,21 @@ export function accessResetPasswordChangePassword({
 export const accessResetPasswordFinished = () => {
   return dispatch => {
     dispatch(accessActionResetPasswordFinished())
+  }
+}
+
+export function accessGetIsAuthenticated() {
+  return async dispatch => {
+    try {
+      console.log('accessGetIsAuthenticated')
+      await accessService.getIsAuthenticated()
+
+      dispatch(accessActionGetIsAuthenticated({ isAuthenticated: true }))
+    } catch (err) {
+      console.log('accessGetIsAuthenticatedFailure')
+      delete api.defaults.headers.Authorization
+      await AsyncStorage.clear()
+      dispatch(accessActionGetIsAuthenticatedFailure())
+    }
   }
 }

@@ -1,31 +1,21 @@
 import * as React from 'react'
-import { styled, createTheme } from '@mui/material/styles'
+import { styled } from '@mui/material/styles'
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar'
 import {
-  Drawer as MuiDrawer,
   Box,
   Toolbar,
-  List,
   Typography,
-  Divider,
-  Container,
-  Grid,
-  Paper,
   Menu,
   MenuItem,
   Tooltip,
   IconButton,
   Avatar
 } from '@mui/material'
-import { Copyright } from '../Copyright'
+import { useDispatch } from 'react-redux'
+import { Menu as MenuIcon } from '@mui/icons-material'
 
-import {
-  Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon
-} from '@mui/icons-material'
+import { getLogOut } from '../../../redux'
 
-const pages = ['Products', 'Pricing', 'Blog']
-const settings = ['Sair']
 const drawerWidth = 240
 
 interface AppBarProps extends MuiAppBarProps {
@@ -55,10 +45,13 @@ interface AppBarData {
   toggleDrawer(): void
 }
 export const AppBar = ({ open, title, toggleDrawer }: AppBarData) => {
+  const dispatch = useDispatch()
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   )
+  const [loadingGetLogOut, setLoadingGetLogOut] = React.useState(false)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget)
@@ -74,9 +67,14 @@ export const AppBar = ({ open, title, toggleDrawer }: AppBarData) => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null)
   }
-  const handleLogOut = () => {
-    handleCloseUserMenu()
-    console.log('Saindo...')
+
+  async function handleGetLogOut() {
+    if (loadingGetLogOut) {
+      return
+    }
+    setLoadingGetLogOut(true)
+    await dispatch(getLogOut())
+    setLoadingGetLogOut(false)
   }
 
   return (
@@ -125,7 +123,7 @@ export const AppBar = ({ open, title, toggleDrawer }: AppBarData) => {
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
           >
-            <MenuItem onClick={handleLogOut}>
+            <MenuItem onClick={handleGetLogOut} disabled={loadingGetLogOut}>
               <Typography textAlign="center">Sair</Typography>
             </MenuItem>
           </Menu>
